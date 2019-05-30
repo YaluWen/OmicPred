@@ -13,7 +13,7 @@
 #' @param X A matrix of demographic variables, should be of the same order as Y (i.e. \code{rownames(X)=names(Y)}). The intercept column is not needed.
 #' @param kernelsOmics kernels used for other omic data. Currently, it only takes linear kernel for non-genomic data. For genomic data, it can take linear and IBS.  Its length should be the same to the number of omics data if provided.
 #' @param AllRegion A bool to indicate whether GSM should be calculated from the entire genome. Default=0.
-#' @return A list that contains Y, Similarities for each omics and train.index, all of which are needed for OmicsPLMMPred algorithm(i.e. the function \code{OmicsPLMMPred}).
+#' @return A list that contains Y, Similarities for each omics and trainID, all of which are needed for OmicsPLMMPred algorithm(i.e. the function \code{OmicsPLMMPred}).
 #' @examples
 #' ## Using the data with pre-calculated GSMs ##
 #' load(system.file("extdata", "Data.rda", package = "KLMMAL"))
@@ -143,7 +143,7 @@ ReadOmicPLMM<-function(OmicsData=list(),  OmicsDataMap=list(),phenofile, trainID
 
   Data=list();
   Data$Y=Y;
-  Data$train.index=train.index;
+  Data$trainID=trainID;
   Data$KernerlOutput=KernerlOutput;
   Data$X=X;
   Data

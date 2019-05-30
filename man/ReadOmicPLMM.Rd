@@ -28,7 +28,7 @@ ReadOmicPLMM(OmicsData = list(), OmicsDataMap = list(), phenofile,
 \item{AllRegion}{A bool to indicate whether GSM should be calculated from the entire genome. Default=0.}
 }
 \value{
-A list that contains Y, Similarities for each omics and train.index, all of which are needed for OmicsPLMMPred algorithm(i.e. the function \code{OmicsPLMMPred}).
+A list that contains Y, Similarities for each omics and trainID, all of which are needed for OmicsPLMMPred algorithm(i.e. the function \code{OmicsPLMMPred}).
 }
 \description{
 \code{ReadOmicPLMM} prepares the data for analyses
