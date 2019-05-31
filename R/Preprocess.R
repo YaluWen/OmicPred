@@ -154,7 +154,7 @@ CalculateSimilarity<-function(OmicsDataEach,OmicsDataEachMap,Annotation,kernels,
   if(nrow(OmicsDataEachMap)!=ncol(OmicsDataEach)) stop("Error: The number of variants included and their annotations do not match")
   Kinship=list();IncludeRegions=NULL; index=1;
   print("Calculating Similarities!")
-  if(AllRegions) {Kinship[[1]]=getKernel(Input=OmicsDataEach,kernels = kernels, Genomic = Genomic, AllRegions=AllRegions); IncludeRegions=rbind(IncludeRegions,"chr1:chr22:all:all");index=index+1}
+  if(AllRegions) {Kinship[[1]]=getKernel(Input=OmicsDataEach,kernels = kernels, Genomic = Genomic); IncludeRegions=rbind(IncludeRegions,"chr1:chr22:all:all");index=index+1}
   for(i in 1:nrow(Annotation))
   {
     tmpnames=apply(as.matrix(annotation[,c("gene","chr","start", "end")]),1,paste,collapse=":")[i];
@@ -171,14 +171,14 @@ CalculateSimilarity<-function(OmicsDataEach,OmicsDataEachMap,Annotation,kernels,
         tmpimpute=apply(input,2,mean,na.rm=T);
         tmpimputegs=matrix(rep(tmpimpute,nrow(input)),nrow=nrow(input),ncol=ncol(input),byrow=T)
         input[nas]=tmpimputegs[nas];
-        tmp3=getKernel(Input=input,kernels = kernels, Genomic = Genomic, AllRegions=0)
+        tmp3=getKernel(Input=input,kernels = kernels, Genomic = Genomic)
       }
       if(ncol(input)==1 | is.null(dim(input)))
       {
         tmpimpute=mean(input,na.rm=T);
         input[is.na(input)]=tmpimpute;
         input=matrix(input,ncol=1);rownames(input)=rownames(OmicsDataEach);
-        tmp3=getKernel(Input=input,kernels = kernels, Genomic = Genomic, AllRegions=0)
+        tmp3=getKernel(Input=input,kernels = kernels, Genomic = Genomic)
       }
       Kinship[[index]]=tmp3;names(Kinship)[index]=tmpnames;
     }

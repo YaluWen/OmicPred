@@ -56,7 +56,7 @@ OmicsPLMM<-function(OmicsData=list(),  OmicsDataMap=list(),
           if(nocl(tmp)!=1) {tmp=apply(tmp,2,scale,na.rm = TRUE);rownames(tmp)=rownames(OmicsData[[i]])}
           if(ncol(tmp)==1) tmp=tmp[,1];
         }
-        if(is.null(dim(tmp))){tmp=scale(tmp, na.rm = TRUE);tmp=matrix(tmp,ncol=1);rownames(tmp)=rownames(OmicsData[[i]])}
+        if(is.null(dim(tmp))){tmp=scale(tmp);tmp=matrix(tmp,ncol=1);rownames(tmp)=rownames(OmicsData[[i]])}
         OmicsData[[i]]=tmp;
       }
     }
