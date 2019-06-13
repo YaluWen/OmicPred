@@ -6,7 +6,6 @@
 #' This function is used to pre-process the data used by the Multi-Kernel Linear Mixed Model with Adaptive Lasso method.
 #' @param OmicsData A list with each element represent data from one omic. The rows is observations, and column is the variants
 #' @param OmicsDataMap A list with each element represent data annotation from one omic. The rows is variants, and column is the annoation. It should have at least 2 columns ("chromosome","position"). The number of rows should be the same as the number of columns in the corresponding omic data
-#' @param phenofile The file containing phenotype information. If provided, will ignore the affected values from the .fam file. The file should contain two columns: pheno: phenotypic values. ID: subject ID for each indidivuals.
 #' @param trainID Subject ID for the training individuals.
 #' @param annotation A data frame providing information to cut the genomes. It has at least four columns: gene, chr, start, end. The gene column must be unique. The other three columns contain information about chromosome, start and end of each regomic region. If Kinship is not provided, then annotation must be provided.
 #' @param Y A vector of phenotypes with each name being subject ID. If provided, will ignore \code{phenofile}.
@@ -30,19 +29,12 @@
 #' annotation=read.table(system.file("extdata", "Annotation.txt", package = "KLMMAL"),header=T);
 #' Data=ReadGenomicPLMM(bed=system.file("extdata", "testing.bed", package = "KLMMAL"),trainID=trainID[,1], annotation = annotation, Y = Y, kernels = c("linear", "poly2"), AllRegions = 0);
 #' @export
-ReadOmicPLMM<-function(OmicsData=list(),  OmicsDataMap=list(),phenofile, trainID ,OmicsKernelMatrix=list(), annotation=NULL, Y=NULL, X=NULL, kernelsrOmics=NA, AllRegions=0)
+ReadOmicPLMM<-function(OmicsData=list(),  OmicsDataMap=list(), trainID ,OmicsKernelMatrix=list(), annotation=NULL, Y, X=NULL, kernelsOmics=NA, AllRegions=0)
 {
   KernerlOutput=list(); kernelstart=1;
 
   ## import phenotypes ##
-  if(is.null(Y) & missing (phenofile) ) stop("Error: You must provide phenotypes for the training data!")
-  if(is.null(Y))
-  {
-    pheno=read.table(phenofile,header = T) # pheno, and ID #
-    if(sum(colnames(pheno) %in% c("pheno", "ID"))!=2) stop("Error: Phenotype files have contain pheno and ID columns")
-    Y=pheno$pheno;
-    names(Y)=pheno$ID;
-  }
+  if(is.null(Y) ) stop("Error: You must provide phenotypes for the training data!")
   if(is.null(names(Y))) stop("Error: There is no IDs for phenotype data!")
   trainID=unique(trainID);
   if(sum(trainID %in% names(Y))!=length(trainID)) stop("Error: The data does not have all the training samples. Check!")
@@ -50,8 +42,8 @@ ReadOmicPLMM<-function(OmicsData=list(),  OmicsDataMap=list(),phenofile, trainID
   if(sum(!is.na(Y[train.index])<5)) stop("Error: Less than 5 subjects for the training samples. The sample size is too small. ")
 
   ## Checking Annotations ##
-  if(is.null(annotation)) stop("Error: You must provide the start and end of each genomic regions. If you have precalculated all Similarities, then you don't need to run this function")
-  if(nrow(annotation)<1 & !AllRegions) stop("Error: Must have at least one genomic regions")
+  if(is.null(annotation)) stop("Error: You must provide the start and end of each regions in annotation. If you have precalculated all Similarities, then you don't need to run this function")
+  if(nrow(annotation)<1 & !AllRegions) stop("Error: Must have at least one region")
   if(sum(colnames(annotation) %in% c("gene","chr","start", "end"))!=4) stop("Error: the annotation must be a dataframe with at least four columns: gene, chr, start, end (gene/region name(unique), chromosome, start and end of the genomic regions)")
   if(length(unique(annotation$gene))!=nrow(annotation)) stop("Error: gene/region names must be unique")
 
@@ -97,26 +89,26 @@ ReadOmicPLMM<-function(OmicsData=list(),  OmicsDataMap=list(),phenofile, trainID
     if(length(OmicsData)>0)
     {
       if(length(OmicsDataMap)!=length(OmicsData)) stop("You must provide the annotation (i.e., chr, position) for each omic data");
-      if(!is.na(kernelsOtherOmics)) {
-        kernelsOtherOmics=tolower(kernelsOtherOmics);
-        if(length(kernelsOtherOmics)!=length(OmicsData)) warning("number of kernels does not match with the data, set to be all linear")
-        if(sum(kernelsOtherOmics[toupper(names(OmicsData))!="SNP"]!="linear")!=0) warning("Currently only support linear kernels for non-genomic data")
-        kernelsOtherOmics[toupper(names(OmicsData))!="SNP"]=rep("linear",length(OmicsData[toupper(names(OmicsData))!="SNP"]));
-        if(length(kernelsOtherOmics[toupper(names(OmicsData))=="SNP"])>0)
+      if(!is.na(kernelsOmics)) {
+        kernelsOmics=tolower(kernelsOmics);
+        if(length(kernelsOmics)!=length(OmicsData)) warning("number of kernels does not match with the data, set to be all linear")
+        if(sum(kernelsOmics[toupper(names(OmicsData))!="SNP"]!="linear")!=0) warning("Currently only support linear kernels for non-genomic data")
+        kernelsOmics[toupper(names(OmicsData))!="SNP"]=rep("linear",length(OmicsData[toupper(names(OmicsData))!="SNP"]));
+        if(length(kernelsOmics[toupper(names(OmicsData))=="SNP"])>0)
         {
-          if(!(tolower(kernelsOtherOmics[toupper(names(OmicsData))=="SNP"]) %in% c("linear","ibs")))
-            kernelsOtherOmics[toupper(names(OmicsData))=="SNP"]='linear';
+          if(!(tolower(kernelsOmics[toupper(names(OmicsData))=="SNP"]) %in% c("linear","ibs")))
+            kernelsOmics[toupper(names(OmicsData))=="SNP"]='linear';
         }
       }
-      if(is.na(kernelsOtherOmics)) kernelsOtherOmics=rep("linear",length(OmicsData));
+      if(is.na(kernelsOmics)) kernelsOmics=rep("linear",length(OmicsData));
       for(i in 1:length(OmicsData))
       {
         KernerlOutput[[kernelstart]]= list();
         OmicsDataEach=OmicsData[[i]];
         OmicsDataEachMap=OmicsDataMap[[i]];
         if(sum(colnames(OmicsDataEachMap) %in% c("position","chromosome"))!=2) stop("Error: the annotation for each omic must be a dataframe with at least four columns: chromosome, position)")
-        if(length(OmicsDataEach)>0 & toupper(names(OmicsData))!="SNP") KernerlOutput[[kernelstart]]= CalculateSimilarity(OmicsDataEach,OmicsDataEachMap,Annotation=annotation,kernels=kernelsOtherOmics[i],AllRegions=AllRegions,Genomic=FALSE);
-        if(length(OmicsDataEach)>0 & toupper(names(OmicsData))=="SNP") KernerlOutput[[kernelstart]]= CalculateSimilarity(OmicsDataEach,OmicsDataEachMap,Annotation=annotation,kernels=kernelsOtherOmics[i],AllRegions=AllRegions,Genomic=TRUE);
+        if(length(OmicsDataEach)>0 & toupper(names(OmicsData))!="SNP") KernerlOutput[[kernelstart]]= CalculateSimilarity(OmicsDataEach,OmicsDataEachMap,Annotation=annotation,kernels=kernelsOmics[i],AllRegions=AllRegions,Genomic=FALSE);
+        if(length(OmicsDataEach)>0 & toupper(names(OmicsData))=="SNP") KernerlOutput[[kernelstart]]= CalculateSimilarity(OmicsDataEach,OmicsDataEachMap,Annotation=annotation,kernels=kernelsOmics[i],AllRegions=AllRegions,Genomic=TRUE);
         kernelstart=kernelstart+1;
       }
     }
@@ -144,7 +136,7 @@ ReadOmicPLMM<-function(OmicsData=list(),  OmicsDataMap=list(),phenofile, trainID
   Data=list();
   Data$Y=Y;
   Data$trainID=trainID;
-  Data$KernerlOutput=KernerlOutput;
+  Data$KernelOutput=KernerlOutput;
   Data$X=X;
   Data
 }
@@ -190,24 +182,27 @@ CalculateSimilarity<-function(OmicsDataEach,OmicsDataEachMap,Annotation,kernels,
   IncludeRegionsNames=IncludeRegionsNamesAll=names(Kinship);
   if(length(Kinship)>1)
   {
-    for(k in 2:length(Kinship))
-    {
-      keep=TRUE;current=Kinship[[k]]
-      if(!is.na(current))
+    include=NULL;
+    for(k in 1:length(Kinship)) {if(length(Kinship[[k]])>0) include=rbind(include,k);if(length(Kinship[[k]])==0)IncludeRegionsNames[k]=NA}
+    if(length(include)>1){
+      for(k in 2:length(include))
       {
-        for(j in (k-1):1)
+        keep=TRUE;current=Kinship[[include[k]]]
+        for(j in 1:(k-1))
         {
-          checking=Kinship[[j]]
-          if(!is.na(checking)) {if(all.equal(checking,current)==TRUE) {keep=FALSE;break;}}
+          #(include[1]:include[k-1])
+          checking=Kinship[[include[j]]]
+          if(all.equal(checking,current)==TRUE) {keep=FALSE;break;}
         }
         if(!keep)
         {
-          IncludeRegionsNames[j]=paste(IncludeRegionsNames[j],IncludeRegionsNames[k],sep="=");
-          IncludeRegionsNames[k]=NA;
-          Kinship[[k]]=list();
+          IncludeRegionsNames[include[j]]=paste(IncludeRegionsNames[include[j]],IncludeRegionsNames[include[k]],sep="=");
+          IncludeRegionsNames[include[k]]=NA;
+          Kinship[[include[k]]]=list();
         }
       }
     }
+
   }
 
   Result=list();
@@ -220,7 +215,7 @@ CalculateSimilarity<-function(OmicsDataEach,OmicsDataEachMap,Annotation,kernels,
 getKernel<-function(Input,kernels,Genomic="FALSE")
 {
   IDs=rownames(Input)
-  output=NA;
+  output=NULL;
   if(kernels=="linear" & Genomic) output=rrBLUP::A.mat(Input);
   if(kernels=="linear" & !Genomic)
   {
@@ -230,12 +225,13 @@ getKernel<-function(Input,kernels,Genomic="FALSE")
     tmpimputegs=matrix(rep(tmpimpute,nrow(Input)),nrow=nrow(Input),ncol=ncol(Input),byrow=T)
     Input[nas]=tmpimputegs[nas];
     tmp3=Input %*% t(Input)/ncol(Input); #tmp3=tmp/tmp2;
-    output=tmp3
+    output=tmp3;
+    output=output/sum(diag(output))*nrow(output);
   }
   if(kernels=="IBS" & Genomic){
     output=varComp::IBS(Input)
   }
-  if(!is.na(output)) colnames(output)=rownames(output)=IDs
+  if(!is.null(output)) colnames(output)=rownames(output)=IDs
   output;
 }
 

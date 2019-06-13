@@ -354,6 +354,7 @@ NRoptim<-function(parameter,parameter0,Y,K,X,lambda,weight,maxiter=1000,NRtol=1e
 
 PLME<-function(K,Y,X=NULL,maxiter=1000,minheri=0.01,lambdarange=c(0,100), tol=1e-6,crit='bic',train.id=NULL, predict=FALSE, weight.fixed=NULL, weight.random=NULL)
 {
+  cat("PLME",predict,"-",!is.null(train.id))
   n=length(Y)
   X=cbind(matrix(1,nrow=n,ncol=1),X);
   if(nrow(X)!=n) stop("Error: covariates and the outcomes are not of the same dimension!")
@@ -399,6 +400,8 @@ PLMEfit<-function(K,Y,X,maxiter=1000,minheri=0.01,lambdarange=c(0,100), tol=1e-6
     X1=X[,which(as.matrix(coef(l1))!=0)];
     if(is.null(dim(X1))) X1=X[,1:(nrow(X)/2)]
     if(ncol(X1)>nrow(X1) & !is.null(dim(X1))) X1=X1[,1:(nrow(X1)/2)]
+    print("HERE1")
+
     random=PLME.Random(K=K,Y=Y,X=X1,maxiter=maxiter,minheri=minheri,lambdarange=lambdarange)
   }
   dr=random$dr;
@@ -495,8 +498,10 @@ PLME.Random<-function(K,Y,X,maxiter=1000,minheri=0.01,lambdarange=c(0,100),weigh
   if(bb$convergence!=0) bb=optim(parameter, fn=negloglikeF, gr=negfirstderisigmaF, K=K,X=X,Y=Y,
                                  control=list(maxit=maxiter),  method="L-BFGS-B")
   initialsave=bb;
+
   parameterfinal=parameter0=bb$par
   if(is.null(weight)) weight=rep(1,length(parameter0[1:length(K)]))
+
   weight=1/abs(parameter0[1:length(K)])*weight;
   #cat("MLE",tail(parameterfinal),"\n")
   # penalized estimates #
@@ -621,8 +626,10 @@ PLMEpredict<-function(K,Y,X,dr,sigma,beta,train.id)
 
 OmicsPLMMPred<-function(Data,predict=FALSE, weight.fixed=NULL,weight.random=NULL,maxiter=1000,minheri=0.01,lambdarange=c(0,100), tol=1e-6,crit='bic',outputall=0)
 {
+  print("PRED")
+  print(predict)
   outcome=Data$Y;
-  train.id=Data$TrainID;
+  train.id=Data$trainID;
   Cov=Data$X;
   if(!is.null(Cov))
   {
@@ -650,31 +657,30 @@ OmicsPLMMPred<-function(Data,predict=FALSE, weight.fixed=NULL,weight.random=NULL
     {
       for(j in 1:length(Data$KernelOutput[[i]]$Kinship))
       {
-        add=TRUE;
-        if(start==1){
-          K[[start]]=Data$KernelOutput[[i]]$Kinship[[j]];
-          names(K)[start]=paste(i,Data$KernelOutput[[i]]$IncludeRegions[j],Data$KernelOutput[[i]]$IncludeRegionsNamesAll[j],sep="_")
-          strat=start+1;
-        }
-        if(start>1){
-          for(k in 1:length(K)){
-            if(all.equal(K[[k]],Data$KernelOutput[[i]]$Kinship[[j]])) {add=FALSE;break;}
-          }
-          if(add){
+        if(length(Data$KernelOutput[[i]]$Kinship[[j]])>0){
+          add=TRUE;
+          if(start==1){
             K[[start]]=Data$KernelOutput[[i]]$Kinship[[j]];
             names(K)[start]=paste(i,Data$KernelOutput[[i]]$IncludeRegions[j],Data$KernelOutput[[i]]$IncludeRegionsNamesAll[j],sep="_")
-            strat=start+1;
+            start=start+1;
           }
-          if(!add){
-            names(K)[k]=paste(paste(names(K)[k],":",sep=""),i,Data$KernelOutput[[i]]$IncludeRegions[j],Data$KernelOutput[[i]]$IncludeRegionsNamesAll[j],sep="_");
+          if(start>1){
+            for(k in 1:length(K)){
+              if(all.equal(K[[k]],Data$KernelOutput[[i]]$Kinship[[j]])==TRUE) {add=FALSE;break;}
+            }
+            if(add){
+              K[[start]]=Data$KernelOutput[[i]]$Kinship[[j]];
+              names(K)[start]=paste(i,Data$KernelOutput[[i]]$IncludeRegions[j],Data$KernelOutput[[i]]$IncludeRegionsNamesAll[j],sep="_")
+              start=start+1;
+            }
+            if(!add){
+              names(K)[k]=paste(paste(names(K)[k],":",sep=""),i,Data$KernelOutput[[i]]$IncludeRegions[j],Data$KernelOutput[[i]]$IncludeRegionsNamesAll[j],sep="_");
+            }
           }
         }
+
       }
     }
-
-      Result$Kinship=Kinship;
-    Result$IncludeRegions=IncludeRegionsNames;
-    Result$IncludeRegionsAll=IncludeRegionsNamesAll;
   }
 
   print("Fitting models")

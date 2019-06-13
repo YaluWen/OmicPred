@@ -62,6 +62,7 @@ OmicsPLMM<-function(OmicsData=list(),  OmicsDataMap=list(),
     }
   }
   Data=ReadOmicPLMM<-function(OmicsData=OmicsData,  OmicsDataMap=OmicsDataMap,phenofile=phenofile, trainID=trainID ,OmicsKernelMatrix=OmicsKernelMatrix, annotation=annotation, Y=Y, X=X, kernelsrOmics=kernelsrOmics, AllRegions=AllRegions)
+
   Result=OmicsPLMMPred(Data=Data,predict=predict, weight.fixed=weight.fixed,weight.random=weight.random,maxiter=maxiter,outputall=outputall,minheri=0.01,lambdarange=c(0,100), tol=1e-6,crit='bic')
   Result
 }
