@@ -34,19 +34,3 @@ A list that contains Y, Similarities for each omics and trainID, all of which ar
 \details{
 This function is used to pre-process the data used by the Multi-Kernel Linear Mixed Model with Adaptive Lasso method.
 }
-\examples{
-## Using the data with pre-calculated GSMs ##
-load(system.file("extdata", "Data.rda", package = "KLMMAL"))
-
-## read both genotype and phenotype files from the disk, and calculate the GSMs using linear kernels ##
-trainID=read.table(system.file("extdata", "TrainID.txt", package = "KLMMAL"));
-annotation=read.table(system.file("extdata", "Annotation.txt", package = "KLMMAL"),header=T);
-Data=ReadGenomicPLMM(bed=system.file("extdata", "testing.bed", package = "KLMMAL"),trainID=trainID[,1], annotation = annotation, phenofile=system.file("extdata", "pheno.txt", package = "KLMMAL"), kernels = c("linear"), AllRegions = 0);
-
-## read genotype from the disk and calculate the GSMs using linear and poly2 kernels##
-pheno=read.table(system.file("extdata", "pheno.txt", package = "KLMMAL"),header=T);
-Y=pheno$pheno;names(Y)=pheno$ID;
-trainID=read.table(system.file("extdata", "TrainID.txt", package = "KLMMAL"));
-annotation=read.table(system.file("extdata", "Annotation.txt", package = "KLMMAL"),header=T);
-Data=ReadGenomicPLMM(bed=system.file("extdata", "testing.bed", package = "KLMMAL"),trainID=trainID[,1], annotation = annotation, Y = Y, kernels = c("linear", "poly2"), AllRegions = 0);
-}
