@@ -4,15 +4,15 @@
 #' \code{ReadOmicPLMM} prepares the data for analyses
 #' @details
 #' This function is used to pre-process the data used by the Multi-Kernel Linear Mixed Model with Adaptive Lasso method.
-#' @param OmicsData A list with each element represent data from one omic. The rows is observations, and column is the variants
-#' @param OmicsDataMap A list with each element represent data annotation from one omic. The rows is variants, and column is the annoation. It should have at least 2 columns ("chromosome","position"). The number of rows should be the same as the number of columns in the corresponding omic data
+#' @param OmicsData A list with each element representing data from one omic. Each row represents an observation, and each column represents a predictor.
+#' @param OmicsDataMap A list with each element representing annotation for one omic. Each row is a predictor. Each row should have at least 2 columns ("chromosome","position"). The number of rows should be the same as the number of columns in the corresponding omic data.
 #' @param trainID Subject ID for the training individuals.
-#' @param annotation A data frame providing information to cut the genomes. It has at least four columns: gene, chr, start, end. The gene column must be unique. The other three columns contain information about chromosome, start and end of each regomic region. If Kinship is not provided, then annotation must be provided.
-#' @param Y A vector of phenotypes with each name being subject ID. If provided, will ignore \code{phenofile}.
+#' @param annotation A data frame providing information to cut the genomes. It has at least four columns: gene, chr, start, end. The gene column must be unique. The other three columns contain information about chromosome, start and end of each genomic region. If Kinship is not provided, then annotation must be provided.
+#' @param Y A vector of phenotypes with each name being subject ID.
 #' @param X A matrix of demographic variables, should be of the same order as Y (i.e. \code{rownames(X)=names(Y)}). The intercept column is not needed.
-#' @param kernelsOmics kernels used for other omic data. Currently, it only takes linear kernel for non-genomic data. For genomic data, it can take linear and IBS.  Its length should be the same to the number of omics data if provided.
-#' @param AllRegion A bool to indicate whether GSM should be calculated from the entire genome. Default=0.
-#' @return A list that contains Y, Similarities for each omics and trainID, all of which are needed for OmicsPLMMPred algorithm(i.e. the function \code{OmicsPLMMPred}).
+#' @param kernelsOmics kernels used for other omic data. Currently, it only uses linear kernel for non-genomic data. For genomic data, it can take linear and IBS.  Its length should be the same as the number of omic data if provided.
+#' @param AllRegion A bool to indicate whether genomic similarity matrix should be calculated from the entire genome. Default=0.
+#' @return A list that contains a vector of outcome (i.e. \code{Y}), a list named \code{KernelOutput} that contains the similarity (i.e. \code{KernelOutput$Kinship}) and region included (i.e. \code{KernelOutput$IncludeRegions}) for each omic and a vector of IDs of training data (i.e. \code{trainID}). All of these are needed for OmicsPLMMPred algorithm (i.e. the function \code{OmicsPLMMPred}).
 #' @export
 ReadOmicPLMM<-function(OmicsData=list(),  OmicsDataMap=list(), trainID ,OmicsKernelMatrix=list(), annotation=NULL, Y, X=NULL, kernelsOmics=NA, AllRegions=0)
 {

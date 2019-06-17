@@ -354,7 +354,7 @@ NRoptim<-function(parameter,parameter0,Y,K,X,lambda,weight,maxiter=1000,NRtol=1e
 
 PLME<-function(K,Y,X=NULL,maxiter=1000,minheri=0.01,lambdarange=c(0,100), tol=1e-6,crit='bic',train.id=NULL, predict=FALSE, weight.fixed=NULL, weight.random=NULL)
 {
-  cat("PLME",predict,"-",!is.null(train.id))
+#  cat("PLME",predict,"-",!is.null(train.id))
   n=length(Y)
   X=cbind(matrix(1,nrow=n,ncol=1),X);
   if(nrow(X)!=n) stop("Error: covariates and the outcomes are not of the same dimension!")
@@ -626,10 +626,10 @@ PLMEpredict<-function(K,Y,X,dr,sigma,beta,train.id)
 
 OmicsPLMMPred<-function(Data,predict=FALSE, weight.fixed=NULL,weight.random=NULL,maxiter=1000,minheri=0.01,lambdarange=c(0,100), tol=1e-6,crit='bic',outputall=0)
 {
-  print("PRED")
-  print(predict)
+  #print("PRED")
+  #print(predict)
   outcome=Data$Y;
-  train.id=Data$trainID;
+  train.id=which(names(Y) %in% Data$trainID);
   Cov=Data$X;
   if(!is.null(Cov))
   {

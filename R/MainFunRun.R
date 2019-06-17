@@ -22,8 +22,7 @@
 #' @param outputall Controls the details of output. \code{outputall=0}, only the prediction and original outputs are saved.  \code{outputall=1}, in addition to the above, the model fit is also saved. \code{outputall=2}, in addition to the above, the similarity matrix is also save (can be large, not suggested).
 #' @return A list that contains original output and the predicted value (if any). The other output is controlled by \code{outputall}.
 #' @export
-OmicsPLMM<-function(OmicsData=list(),  OmicsDataMap=list(),
-                   phenofile, trainID ,OmicsKernelMatrix=list(),
+OmicsPLMM<-function(OmicsData=list(),  OmicsDataMap=list(), trainID ,OmicsKernelMatrix=list(),
                    annotation=NULL, Y=NULL, X=NULL, kernelsrOmics=NA, AllRegions=0,
                    stdData = TRUE,
                    predict = FALSE, weight.fixed = NULL, weight.random = NULL,
@@ -46,7 +45,7 @@ OmicsPLMM<-function(OmicsData=list(),  OmicsDataMap=list(),
       }
     }
   }
-  Data=ReadOmicPLMM<-function(OmicsData=OmicsData,  OmicsDataMap=OmicsDataMap,phenofile=phenofile, trainID=trainID ,OmicsKernelMatrix=OmicsKernelMatrix, annotation=annotation, Y=Y, X=X, kernelsrOmics=kernelsrOmics, AllRegions=AllRegions)
+  Data=ReadOmicPLMM<-function(OmicsData=OmicsData,  OmicsDataMap=OmicsDataMap,trainID=trainID ,OmicsKernelMatrix=OmicsKernelMatrix, annotation=annotation, Y=Y, X=X, kernelsrOmics=kernelsrOmics, AllRegions=AllRegions)
 
   Result=OmicsPLMMPred(Data=Data,predict=predict, weight.fixed=weight.fixed,weight.random=weight.random,maxiter=maxiter,outputall=outputall,minheri=0.01,lambdarange=c(0,100), tol=1e-6,crit='bic')
   Result
