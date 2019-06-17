@@ -13,21 +13,6 @@
 #' @param kernelsOmics kernels used for other omic data. Currently, it only takes linear kernel for non-genomic data. For genomic data, it can take linear and IBS.  Its length should be the same to the number of omics data if provided.
 #' @param AllRegion A bool to indicate whether GSM should be calculated from the entire genome. Default=0.
 #' @return A list that contains Y, Similarities for each omics and trainID, all of which are needed for OmicsPLMMPred algorithm(i.e. the function \code{OmicsPLMMPred}).
-#' @examples
-#' ## Using the data with pre-calculated GSMs ##
-#' load(system.file("extdata", "Data.rda", package = "KLMMAL"))
-#'
-#' ## read both genotype and phenotype files from the disk, and calculate the GSMs using linear kernels ##
-#' trainID=read.table(system.file("extdata", "TrainID.txt", package = "KLMMAL"));
-#' annotation=read.table(system.file("extdata", "Annotation.txt", package = "KLMMAL"),header=T);
-#' Data=ReadGenomicPLMM(bed=system.file("extdata", "testing.bed", package = "KLMMAL"),trainID=trainID[,1], annotation = annotation, phenofile=system.file("extdata", "pheno.txt", package = "KLMMAL"), kernels = c("linear"), AllRegions = 0);
-#'
-#' ## read genotype from the disk and calculate the GSMs using linear and poly2 kernels##
-#' pheno=read.table(system.file("extdata", "pheno.txt", package = "KLMMAL"),header=T);
-#' Y=pheno$pheno;names(Y)=pheno$ID;
-#' trainID=read.table(system.file("extdata", "TrainID.txt", package = "KLMMAL"));
-#' annotation=read.table(system.file("extdata", "Annotation.txt", package = "KLMMAL"),header=T);
-#' Data=ReadGenomicPLMM(bed=system.file("extdata", "testing.bed", package = "KLMMAL"),trainID=trainID[,1], annotation = annotation, Y = Y, kernels = c("linear", "poly2"), AllRegions = 0);
 #' @export
 ReadOmicPLMM<-function(OmicsData=list(),  OmicsDataMap=list(), trainID ,OmicsKernelMatrix=list(), annotation=NULL, Y, X=NULL, kernelsOmics=NA, AllRegions=0)
 {
