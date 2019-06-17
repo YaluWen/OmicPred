@@ -21,21 +21,6 @@
 #' @param maxiter Maximum number of iterations. Default is 1000.
 #' @param outputall Controls the details of output. \code{outputall=0}, only the prediction and original outputs are saved.  \code{outputall=1}, in addition to the above, the model fit is also saved. \code{outputall=2}, in addition to the above, the similarity matrix is also save (can be large, not suggested).
 #' @return A list that contains original output and the predicted value (if any). The other output is controlled by \code{outputall}.
-#' @examples
-#' ## Using the data with pre-calculated GSMs ##
-#' load(system.file("extdata", "Data.rda", package = "KLMMAL"))
-#'
-#' ## read both genotype and phenotype files from the disk, and calculate the GSMs using linear kernels ##
-#' trainID=read.table(system.file("extdata", "TrainID.txt", package = "KLMMAL"));
-#' annotation=read.table(system.file("extdata", "Annotation.txt", package = "KLMMAL"),header=T);
-#' Data=ReadGenomicPLMM(bed=system.file("extdata", "testing.bed", package = "KLMMAL"),trainID=trainID[,1], annotation = annotation, phenofile=system.file("extdata", "pheno.txt", package = "KLMMAL"), kernels = c("linear"), AllRegions = 0);
-#'
-#' ## read genotype from the disk and calculate the GSMs using linear and poly2 kernels##
-#' pheno=read.table(system.file("extdata", "pheno.txt", package = "KLMMAL"),header=T);
-#' Y=pheno$pheno;names(Y)=pheno$ID;
-#' trainID=read.table(system.file("extdata", "TrainID.txt", package = "KLMMAL"));
-#' annotation=read.table(system.file("extdata", "Annotation.txt", package = "KLMMAL"),header=T);
-#' Data=ReadGenomicPLMM(bed=system.file("extdata", "testing.bed", package = "KLMMAL"),trainID=trainID[,1], annotation = annotation, Y = Y, kernels = c("linear", "poly2"), AllRegions = 0);
 #' @export
 OmicsPLMM<-function(OmicsData=list(),  OmicsDataMap=list(),
                    phenofile, trainID ,OmicsKernelMatrix=list(),

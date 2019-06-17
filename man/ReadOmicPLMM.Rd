@@ -4,16 +4,14 @@
 \alias{ReadOmicPLMM}
 \title{Multi-kernel linear mixed model with adaptive lasso for prediction analysis on high-dimensional multi-omics data}
 \usage{
-ReadOmicPLMM(OmicsData = list(), OmicsDataMap = list(), phenofile,
-  trainID, OmicsKernelMatrix = list(), annotation = NULL, Y = NULL,
-  X = NULL, kernelsrOmics = NA, AllRegions = 0)
+ReadOmicPLMM(OmicsData = list(), OmicsDataMap = list(), trainID,
+  OmicsKernelMatrix = list(), annotation = NULL, Y, X = NULL,
+  kernelsOmics = NA, AllRegions = 0)
 }
 \arguments{
 \item{OmicsData}{A list with each element represent data from one omic. The rows is observations, and column is the variants}
 
 \item{OmicsDataMap}{A list with each element represent data annotation from one omic. The rows is variants, and column is the annoation. It should have at least 2 columns ("chromosome","position"). The number of rows should be the same as the number of columns in the corresponding omic data}
-
-\item{phenofile}{The file containing phenotype information. If provided, will ignore the affected values from the .fam file. The file should contain two columns: pheno: phenotypic values. ID: subject ID for each indidivuals.}
 
 \item{trainID}{Subject ID for the training individuals.}
 
