@@ -4,22 +4,20 @@
 \alias{OmicsPLMM}
 \title{Multi-kernel linear mixed model with adaptive lasso for prediction analysis on high-dimensional multi-omics data}
 \usage{
-OmicsPLMM(OmicsData = list(), OmicsDataMap = list(), phenofile,
-  trainID, OmicsKernelMatrix = list(), annotation = NULL, Y = NULL,
+OmicsPLMM(OmicsData = list(), OmicsDataMap = list(), trainID,
+  OmicsKernelMatrix = list(), annotation = NULL, Y = NULL,
   X = NULL, kernelsrOmics = NA, AllRegions = 0, stdData = TRUE,
   predict = FALSE, weight.fixed = NULL, weight.random = NULL,
   maxiter = 1000, outputall = FALSE)
 }
 \arguments{
-\item{OmicsData}{A list with each element representing data from one omic. Each row is an observations, and each column is the variants. NA represents missing. For the subject with missing omcis, then the subject should be in the corresponding omic, but with missing entry.}
+\item{OmicsData}{A list with each element representing data from one omic. Each row is an observation, and each column represents a predictor. NA represents missing. For the subject with missing omics,the subject should be in the corresponding omic, but with missing entry.}
 
-\item{OmicsDataMap}{A list with each element represent data annotation from one omic. The row is variants, and column is the annoation. It should have at least 2 columns ("chromosome","position"). The number of rows should be the same as the number of columns in the corresponding omic data}
-
-\item{phenofile}{The file containing phenotype information. If provided, will ignore the affected values from the .fam file. The file should contain two columns: pheno: phenotypic values. ID: subject ID for each indidivuals.}
+\item{OmicsDataMap}{A list with each element representing annotation for one omic. Each row is a predictor. Each row should have at least 2 columns ("chromosome","position"). The number of rows should be the same as the number of columns in the corresponding omic data.}
 
 \item{trainID}{Subject ID for the training individuals.}
 
-\item{OmicsKernelMatrix}{XXX}
+\item{OmicsKernelMatrix}{A list with each element represents similarity matrices for each omic data. If provided, will ignore the inputs from \code{OmicsData} and \code{OmicsDataMap}.}
 
 \item{annotation}{A data frame providing information to cut the genomes. It has at least four columns: gene, chr, start, end. The gene column must be unique. The other three columns contain information about chromosome, start and end of each regomic region. #####If Kinship is not provided, then annotation must be provided.}
 

@@ -7,6 +7,7 @@
 #' @param OmicsData A list with each element representing data from one omic. Each row represents an observation, and each column represents a predictor.
 #' @param OmicsDataMap A list with each element representing annotation for one omic. Each row is a predictor. Each row should have at least 2 columns ("chromosome","position"). The number of rows should be the same as the number of columns in the corresponding omic data.
 #' @param trainID Subject ID for the training individuals.
+#' @param OmicsKernelMatrix A list with each element represents similarity matrices for each omic data. If provided, will ignore the inputs from \code{OmicsData} and \code{OmicsDataMap}.
 #' @param annotation A data frame providing information to cut the genomes. It has at least four columns: gene, chr, start, end. The gene column must be unique. The other three columns contain information about chromosome, start and end of each genomic region. If Kinship is not provided, then annotation must be provided.
 #' @param Y A vector of phenotypes with each name being subject ID.
 #' @param X A matrix of demographic variables, should be of the same order as Y (i.e. \code{rownames(X)=names(Y)}). The intercept column is not needed.
@@ -71,41 +72,49 @@ ReadOmicPLMM<-function(OmicsData=list(),  OmicsDataMap=list(), trainID ,OmicsKer
 
   ## Deal with Omics Data ##
   {
-    if(length(OmicsData)>0)
+    if(length(OmicsKernelMatrix)==0)
     {
-      if(length(OmicsDataMap)!=length(OmicsData)) stop("You must provide the annotation (i.e., chr, position) for each omic data");
-      if(!is.na(kernelsOmics)) {
-        kernelsOmics=tolower(kernelsOmics);
-        if(length(kernelsOmics)!=length(OmicsData)) warning("number of kernels does not match with the data, set to be all linear")
-        if(sum(kernelsOmics[toupper(names(OmicsData))!="SNP"]!="linear")!=0) warning("Currently only support linear kernels for non-genomic data")
-        kernelsOmics[toupper(names(OmicsData))!="SNP"]=rep("linear",length(OmicsData[toupper(names(OmicsData))!="SNP"]));
-        if(length(kernelsOmics[toupper(names(OmicsData))=="SNP"])>0)
-        {
-          if(!(tolower(kernelsOmics[toupper(names(OmicsData))=="SNP"]) %in% c("linear","ibs")))
-            kernelsOmics[toupper(names(OmicsData))=="SNP"]='linear';
-        }
-      }
-      if(is.na(kernelsOmics)) kernelsOmics=rep("linear",length(OmicsData));
-      for(i in 1:length(OmicsData))
+      if(length(OmicsData)>0)
       {
-        KernerlOutput[[kernelstart]]= list();
-        OmicsDataEach=OmicsData[[i]];
-        OmicsDataEachMap=OmicsDataMap[[i]];
-        if(sum(colnames(OmicsDataEachMap) %in% c("position","chromosome"))!=2) stop("Error: the annotation for each omic must be a dataframe with at least four columns: chromosome, position)")
-        if(length(OmicsDataEach)>0 & toupper(names(OmicsData))!="SNP") KernerlOutput[[kernelstart]]= CalculateSimilarity(OmicsDataEach,OmicsDataEachMap,Annotation=annotation,kernels=kernelsOmics[i],AllRegions=AllRegions,Genomic=FALSE);
-        if(length(OmicsDataEach)>0 & toupper(names(OmicsData))=="SNP") KernerlOutput[[kernelstart]]= CalculateSimilarity(OmicsDataEach,OmicsDataEachMap,Annotation=annotation,kernels=kernelsOmics[i],AllRegions=AllRegions,Genomic=TRUE);
-        kernelstart=kernelstart+1;
+        if(length(OmicsDataMap)!=length(OmicsData)) stop("You must provide the annotation (i.e., chr, position) for each omic data");
+        if(!is.na(kernelsOmics)) {
+          kernelsOmics=tolower(kernelsOmics);
+          if(length(kernelsOmics)!=length(OmicsData)) warning("number of kernels does not match with the data, set to be all linear")
+          if(sum(kernelsOmics[toupper(names(OmicsData))!="SNP"]!="linear")!=0) warning("Currently only support linear kernels for non-genomic data")
+          kernelsOmics[toupper(names(OmicsData))!="SNP"]=rep("linear",length(OmicsData[toupper(names(OmicsData))!="SNP"]));
+          if(length(kernelsOmics[toupper(names(OmicsData))=="SNP"])>0)
+          {
+            if(!(tolower(kernelsOmics[toupper(names(OmicsData))=="SNP"]) %in% c("linear","ibs")))
+              kernelsOmics[toupper(names(OmicsData))=="SNP"]='linear';
+          }
+        }
+        if(is.na(kernelsOmics)) kernelsOmics=rep("linear",length(OmicsData));
+        for(i in 1:length(OmicsData))
+        {
+          KernerlOutput[[kernelstart]]= list();
+          OmicsDataEach=OmicsData[[i]];
+          OmicsDataEachMap=OmicsDataMap[[i]];
+          if(sum(colnames(OmicsDataEachMap) %in% c("position","chromosome"))!=2) stop("Error: the annotation for each omic must be a dataframe with at least four columns: chromosome, position)")
+          if(length(OmicsDataEach)>0 & toupper(names(OmicsData))!="SNP") KernerlOutput[[kernelstart]]= CalculateSimilarity(OmicsDataEach,OmicsDataEachMap,Annotation=annotation,kernels=kernelsOmics[i],AllRegions=AllRegions,Genomic=FALSE);
+          if(length(OmicsDataEach)>0 & toupper(names(OmicsData))=="SNP") KernerlOutput[[kernelstart]]= CalculateSimilarity(OmicsDataEach,OmicsDataEachMap,Annotation=annotation,kernels=kernelsOmics[i],AllRegions=AllRegions,Genomic=TRUE);
+          kernelstart=kernelstart+1;
+        }
       }
     }
 
+
     if(length(OmicsKernelMatrix)>0)
     {
-      if(length(OmicsKernelMatrix)!=length(OmicsData)) warning("Given matrix for omics data not match to the number of other omics, ignore this input")
+      if(length(OmicsKernelMatrix)!=length(OmicsData)) stop("Given matrix for omics data not match to the number of other omics, please provide the right similarity matrix")
       if(length(OmicsKernelMatrix)==length(OmicsData))
       {
+        kernelindex=1;
         for(i in 1:length(OmicsKernelMatrix))
         {
-          if(length(OmicsKernelMatrix[[i]])>0) {KernerlOutput[[i]]$Kinship=OmicsKernelMatrix[[i]]}
+          KernerlOutput[[kernelindex]]=list();
+          KernerlOutput[[kernelindex]]$IncludeRegions="provided"
+          if(length(OmicsKernelMatrix[[i]])>0) {KernerlOutput[[kernelindex]]$Kinship=OmicsKernelMatrix[[i]];kernelindex=kernelindex+1;}
+          if(length(OmicsKernelMatrix[[i]])==0) warning(paste("The ", i, "th provided omics data is not a similarity matrix, and thus ignore!"))
         }
       }
     }
