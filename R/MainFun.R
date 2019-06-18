@@ -451,7 +451,7 @@ PLME.Fixed<-function(K,Y,X,dr,sigma,maxiter=1000,tol=1e-10,crit='bic',weight=NUL
 
   weight=weight*1/abs(beta0);
   weight[1]=0;
-  print("Getting fixed effects: run!")
+  #print("Getting fixed effects: run!")
 
   result=list();
   result$lambda=0;
@@ -491,7 +491,7 @@ PLME.Random<-function(K,Y,X,maxiter=1000,minheri=0.01,lambdarange=c(0,100),weigh
   dr=rep(tmp1,length(K)) # genetics total explains 50% heri
   parameter=c(dr,sigma)
   # initial estimates #
-  print("Getting MLEs")
+  #print("Getting MLEs")
   bb=optim(parameter, fn=negloglikeF, gr=negfirstderisigmaF, K=K,X=X,Y=Y,
            control=list(maxit=maxiter),  method="L-BFGS-B");
   # print(bb$par[1:10]);print(bb$convergence)
@@ -505,7 +505,7 @@ PLME.Random<-function(K,Y,X,maxiter=1000,minheri=0.01,lambdarange=c(0,100),weigh
   weight=1/abs(parameter0[1:length(K)])*weight;
   #cat("MLE",tail(parameterfinal),"\n")
   # penalized estimates #
-  print("Getting PLEs:")
+  #print("Getting PLEs:")
   lambdarange=lambdarange[order(lambdarange)]
   seqdif=(lambdarange[2]-lambdarange[1])/10;lambdaall=seq(from=lambdarange[1],to=lambdarange[2],by=seqdif);
   BICs=NULL;
@@ -541,7 +541,7 @@ PLME.Random<-function(K,Y,X,maxiter=1000,minheri=0.01,lambdarange=c(0,100),weigh
   }
   colnames(BICs)=c("lambda","BICs",paste("d",1:(length(parameterfinal)-1),sep=""),"sigma","converge")
 
-  print("Getting PLEs: choosing lambda")
+  #print("Getting PLEs: choosing lambda")
   # finetune lambda #
   select=which(BICs[,"BICs"]==min(BICs[,"BICs"]))[1]
   if(sum(BICs[,"converge"]==0)>0) select=which(BICs[BICs[,"converge"]==0,"BICs"]==min(BICs[BICs[,"converge"]==0,"BICs"]))[1]
