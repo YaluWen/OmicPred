@@ -639,11 +639,11 @@ OmicsPLMMPred<-function(Data,predict=FALSE, weight.fixed=NULL,weight.random=NULL
   XCov=Cov;
   if(!is.null(XCov))
   {
-    if(length(weight.fixed)!=ncol(Xcov)){
+    if(length(weight.fixed)!=ncol(XCov) & (!is.null(weight.fixed))){
       warning("fixed weight does not have the same length as covaraites, and thus set to 1")
       weight.fixed=NULL;
     }
-    Xcovtmp=apply(XCov[Data$TrainID,],2,sd)!=0
+    Xcovtmp=apply(XCov[train.id,],2,sd)!=0
     if(sum(Xcovtmp)>0) XCov=XCov[,Xcovtmp];
     if(!is.null(weight.fixed) ) weight.fixed=weight.fixed[c(TRUE,Xcovtmp)]
     if(sum(Xcovtmp)==0) {XCov=NULL;weight.fixed=NULL}

@@ -124,7 +124,7 @@ ReadOmicPLMM<-function(OmicsData=list(),  OmicsDataMap=list(), trainID ,OmicsKer
   ## Compare the consistencies between X and Ys ##
   if(!is.null(X))
   {
-    if(rownames(X)!=names(Y)) stop("X and Y should be of the same order")
+    if(sum(rownames(X)!=names(Y))) stop("X and Y should be of the same order")
   }
 
   Data=list();
